@@ -63,6 +63,7 @@ ul {
 }
 button {
   border: none;
+  outline: none;
   background-color: white;
   padding: 5px 10px;
 }
@@ -101,8 +102,16 @@ button {
   justify-content: space-between;
   width: 100%;
 }
-.container p {
+.container input {
+  padding: 0;
   padding-left: 10px;
+  background-color: white;
+}
+.btn__text {
+  padding: 0;
+}
+.btn__text:hover {
+  border: none;
 }
 .input__completed {
   text-decoration: line-through;
@@ -110,6 +119,7 @@ button {
 }
 .container__todo {
   display: flex;
+  align-items: center;
 }
 .checkbox {
   width: 30px;
