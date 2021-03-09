@@ -1,102 +1,143 @@
 var items = [];
 var id_count = 0;
-var state = 'all';
+var state = "all";
+
 function addItem(event) {
   if (event.keyCode == 13) {
     var txt = document.getElementById("txt_todo").value.trim();
-    id = id_count;
-    items.push({ txt, id, status: false });
+    if (txt != "") {
+      id = id_count;
+      items.push({ txt, id, status: false });
 
-    var newLi = document.createElement("li");
-    newLi.className = "container__el";
-    newLi.id = `li-${id}`;
+      var newLi = document.createElement("li");
+      newLi.className = "container__el";
+      newLi.id = `li-${id}`;
 
-    var newSubDiv = document.createElement("div");
-    newSubDiv.className = "container__todo";
+      var newSubDiv = document.createElement("div");
+      newSubDiv.className = "container__todo";
 
-    var newCheckBox = document.createElement("input");
-    newCheckBox.type = "checkbox";
-    newCheckBox.className = "checkbox";
-    newCheckBox.id = `id-${id}`;
+      var newCheckBoxDiv = document.createElement("div");
+      newCheckBoxDiv.className = "round";
+      var newLabel = document.createElement("label");
+      newLabel.htmlFor = `id-${id}`;
+      var newCheckBox = document.createElement("input");
+      newCheckBox.type = "checkbox";
+      newCheckBox.id = `id-${id}`;
 
-    newPar = document.createElement("input");
-    newPar.id = `txt-${id}`;
-    newPar.value = txt;
-    newPar.disabled = true;
-    newPar.addEventListener("blur", hideInput);
+      newCheckBoxDiv.appendChild(newCheckBox);
+      newCheckBoxDiv.appendChild(newLabel);
+      newCheckBox.addEventListener("click", checkCompleted);
 
-    var newDblBtn = document.createElement("button");
-    newDblBtn.className = "btn__text";
-    newDblBtn.id = `btn-${id}`;
-    newDblBtn.addEventListener("dblclick", showInput);
+      newText = document.createElement("input");
+      newText.id = `txt-${id}`;
+      newText.value = txt;
+      newText.size = "50";
+      newText.addEventListener("blur", hideInput);
 
-    var newBtn = document.createElement("button");
-    newBtn.className = "btn__del";
-    newBtn.textContent = "x";
-    newBtn.id = `${id}`;
+      var newPar = document.createElement("p");
+      newPar.id = `p-${id}`;
+      newPar.innerHTML = txt;
+      newPar.addEventListener("dblclick", showInput);
 
-    newDblBtn.appendChild(newPar);
-    newSubDiv.appendChild(newCheckBox);
-    newSubDiv.appendChild(newDblBtn);
-    newLi.appendChild(newSubDiv);
-    newLi.appendChild(newBtn);
+      var newBtnDel = document.createElement("i");
+      newBtnDel.className = "fas fa-times";
+      newBtnDel.id = `${id}`;
+      newBtnDel.addEventListener("click", delOneItem);
 
-    document.getElementById("txt_todo").value = " ";
-    document.getElementById("items__left").textContent = `${
-      items.filter((e) => e.status == false).length
-    } `;
+      newSubDiv.appendChild(newCheckBoxDiv);
+      newSubDiv.appendChild(newPar);
+      newSubDiv.appendChild(newText);
+      newLi.appendChild(newSubDiv);
+      newLi.appendChild(newBtnDel);
 
-    var ul = document.getElementById("container__list");
-    id_count++;
-    newBtn.addEventListener("click", delOneItem);
+      document.getElementById("txt_todo").value = "";
+      document.getElementById("items__left").textContent = `${
+        items.filter((e) => e.status == false).length
+      } `;
 
-    newCheckBox.addEventListener("click", checkCompleted);
-
-    ul.appendChild(newLi);
+      var ul = document.getElementById("container__list");
+      id_count++;
+      ul.appendChild(newLi);
+      styleAllOption();
+      filterOption(state);
+    }
   }
 }
 function showInput() {
   let id = this.id.split("-")[1];
-  let ip = document.getElementById(`txt-${id}`);
-  ip.disabled = false;
+  let id_text = document.getElementById(`txt-${id}`);
+  document.getElementById(`p-${id}`).style.display = "none";
+  id_text.style.display = "block";
+  var val = document.getElementById(`p-${id}`).innerHTML;
+  id_text.focus(); //sets focus to element
+  id_text.value = ""; //clear the value of the element
+  id_text.value = val; //set that value back.
 }
 
 function hideInput() {
-  this.disabled = true;
+  let id = this.id.split("-")[1];
+  let id_text = document.getElementById(`txt-${id}`);
+  document.getElementById(`p-${id}`).innerHTML = id_text.value;
+  this.style.display = "none";
+  document.getElementById(`p-${id}`).style.display = "block";
 }
 
 function checkCompleted() {
   let idCheck = this.id;
   let id = idCheck.split("-")[1];
+
   if (this.checked) {
     for (let item of items) {
       if (item.id == +id) item.status = true;
     }
-    document.getElementById(`txt-${id}`).classList.add("input__completed");
+    document.getElementById(`p-${id}`).classList.add("completed__item");
   } else {
     for (let item of items) {
       if (item.id == +id) item.status = false;
     }
-    document.getElementById(`txt-${id}`).classList.remove("input__completed");
+    document.getElementById(`p-${id}`).classList.remove("completed__item");
   }
+
   document.getElementById("items__left").textContent = `${
     items.filter((e) => e.status == false).length
   } `;
-  if (items.filter((e) => e.status == true).length == id_count)
-    document.getElementById("allOption").style.color = "gray";
-  else document.getElementById("allOption").style.color = null;
 
+  styleAllOption();
+  styleClearCompleted();
   filterOption(state);
+}
+
+function styleAllOption() {
+  let footer__bar = document.getElementsByClassName("footer-bar");
+  let _allOption = document.getElementById("allOption");
+  if (items.length > 0) {
+    _allOption.style.visibility = "visible";
+    footer__bar[0].style.display = "flex";
+    if (items.filter((e) => e.status == true).length == items.length)
+      _allOption.style.color = "gray";
+    else _allOption.style.color = null;
+  } else {
+    _allOption.style.visibility = "hidden";
+    footer__bar[0].style.display = "none";
+  }
+}
+
+function styleClearCompleted() {
+  let btnClear = document.getElementsByClassName("btn__clear");
+  if (items.filter((e) => e.status == true).length > 0) {
+    btnClear[0].style.visibility = "visible";
+  } else btnClear[0].style.visibility = "hidden";
 }
 
 function delOneItem() {
   this.parentNode.remove();
   const id = this.id;
   items = items.filter((e) => e.id != id);
-  document.getElementById("items__left").textContent = `${
-    items.filter((e) => e.status == false).length
-  } `;
+  document.getElementById("items__left").textContent = `${items.filter((e) => e.status == false).length} `;
+  styleClearCompleted();
+  styleAllOption();
 }
+
 function delAll() {
   let arr = [];
   for (let item of items) {
@@ -108,6 +149,8 @@ function delAll() {
     }
   }
   items = arr;
+  styleClearCompleted();
+  styleAllOption();
 }
 
 function showAll() {
@@ -127,7 +170,6 @@ function active() {
   }
 }
 function completed() {
-  document.getElementsByClassName("btn");
   for (let item of items) {
     let li = document.getElementById(`li-${item.id}`);
     if (item.status == false) {
@@ -139,13 +181,19 @@ function completed() {
 }
 function filterOption(status) {
   state = status;
+  let cur_active = document.getElementsByClassName("active");
+  cur_active[0].classList.remove("active");
+  let btn_filter = document.getElementsByClassName("btn");
   if (status == "all") {
+    btn_filter[0].classList.add("active");
     showAll();
   }
   if (status == "active") {
+    btn_filter[1].classList.add("active");
     active();
   }
   if (status == "completed") {
+    btn_filter[2].classList.add("active");
     completed();
   }
 }
@@ -156,8 +204,8 @@ function allOption() {
         item.status = true;
         document.getElementById(`id-${item.id}`).checked = true;
         document
-          .getElementById(`txt-${item.id}`)
-          .classList.add("input__completed");
+          .getElementById(`p-${item.id}`)
+          .classList.add("completed__item");
         document.getElementById("allOption").style.color = "gray";
       }
     }
@@ -168,8 +216,8 @@ function allOption() {
         item.status = false;
         document.getElementById(`id-${item.id}`).checked = false;
         document
-          .getElementById(`txt-${item.id}`)
-          .classList.remove("input__completed");
+          .getElementById(`p-${item.id}`)
+          .classList.remove("completed__item");
         document.getElementById("allOption").style.color = null;
       }
     }
@@ -177,5 +225,7 @@ function allOption() {
       items.filter((e) => e.status == false).length
     } `;
   }
+  styleAllOption();
+  styleClearCompleted();
   filterOption(state);
 }
