@@ -33,6 +33,11 @@ function addItem(event) {
       newText.value = txt;
       newText.size = "50";
       newText.addEventListener("blur", hideInput);
+      newText.addEventListener("keydown", ({ key }) => {
+        if (key === "Enter") {
+          hideInputEnter();
+        }
+      });
 
       var newPar = document.createElement("p");
       newPar.id = `p-${id}`;
@@ -72,6 +77,15 @@ function showInput() {
   id_text.focus(); //sets focus to element
   id_text.value = ""; //clear the value of the element
   id_text.value = val; //set that value back.
+  document.getElementById(`${id}`).style.display = "none";
+}
+
+function hideInputEnter() {
+  let id_text = document.getElementById(`txt-${id}`);
+  document.getElementById(`p-${id}`).innerHTML = id_text.value;
+  id_text.style.display = "none";
+  document.getElementById(`p-${id}`).style.display = "block";
+  document.getElementById(`${id}`).style.display = null;
 }
 
 function hideInput() {
@@ -80,24 +94,17 @@ function hideInput() {
   document.getElementById(`p-${id}`).innerHTML = id_text.value;
   this.style.display = "none";
   document.getElementById(`p-${id}`).style.display = "block";
+  document.getElementById(`${id}`).style.display = null;
 }
 
 function checkCompleted() {
   let idCheck = this.id;
   let id = idCheck.split("-")[1];
-
-  if (this.checked) {
-    for (let item of items) {
-      if (item.id == +id) item.status = true;
-    }
-    document.getElementById(`p-${id}`).classList.add("completed__item");
-  } else {
-    for (let item of items) {
-      if (item.id == +id) item.status = false;
-    }
-    document.getElementById(`p-${id}`).classList.remove("completed__item");
+  for (let item of items) {
+    if (item.id == +id) item.status = !item.status;
   }
 
+  document.getElementById(`p-${id}`).classList.toggle("completed__item");
   document.getElementById("items__left").textContent = `${
     items.filter((e) => e.status == false).length
   } `;
@@ -110,15 +117,18 @@ function checkCompleted() {
 function styleAllOption() {
   let footer__bar = document.getElementsByClassName("footer-bar");
   let _allOption = document.getElementById("allOption");
+  let lineEnding = document.getElementById("line__ending");
   if (items.length > 0) {
     _allOption.style.visibility = "visible";
     footer__bar[0].style.display = "flex";
+    lineEnding.style.display = "block";
     if (items.filter((e) => e.status == true).length == items.length)
       _allOption.style.color = "gray";
     else _allOption.style.color = null;
   } else {
     _allOption.style.visibility = "hidden";
     footer__bar[0].style.display = "none";
+    lineEnding.style.display = "none";
   }
 }
 
@@ -133,7 +143,9 @@ function delOneItem() {
   this.parentNode.remove();
   const id = this.id;
   items = items.filter((e) => e.id != id);
-  document.getElementById("items__left").textContent = `${items.filter((e) => e.status == false).length} `;
+  document.getElementById("items__left").textContent = `${
+    items.filter((e) => e.status == false).length
+  } `;
   styleClearCompleted();
   styleAllOption();
 }
