@@ -1,26 +1,28 @@
-var items = [];
-var id_count = 0;
-var state = "all";
+let items = [];
+let id_count = 0;
+let state = "all";
 
 function addItem(event) {
   if (event.keyCode == 13) {
-    var txt = document.getElementById("txt_todo").value.trim();
-    if (txt != "") {
-      id = id_count;
+    let txt = document.getElementById("txt_todo").value.trim();
+    if (txt !== "") {
+      let id = id_count;
       items.push({ txt, id, status: false });
 
-      var newLi = document.createElement("li");
+      let newLi = document.createElement("li");
       newLi.className = "container__el";
       newLi.id = `li-${id}`;
 
-      var newSubDiv = document.createElement("div");
+      let newSubDiv = document.createElement("div");
       newSubDiv.className = "container__todo";
 
-      var newCheckBoxDiv = document.createElement("div");
+      let newCheckBoxDiv = document.createElement("div");
       newCheckBoxDiv.className = "round";
-      var newLabel = document.createElement("label");
+
+      let newLabel = document.createElement("label");
       newLabel.htmlFor = `id-${id}`;
-      var newCheckBox = document.createElement("input");
+
+      let newCheckBox = document.createElement("input");
       newCheckBox.type = "checkbox";
       newCheckBox.id = `id-${id}`;
 
@@ -32,22 +34,25 @@ function addItem(event) {
       newText.id = `txt-${id}`;
       newText.value = txt;
       newText.size = "50";
-      newText.addEventListener("blur", hideInput);
-      newText.addEventListener("keydown", ({ key }) => {
-        if (key === "Enter") {
-          hideInputEnter();
-        }
-      });
 
-      var newPar = document.createElement("p");
+      newText.onkeypress = function ({ key }) {
+        if (key === "Enter") hideInput(`txt-${id}`);
+      };
+      newText.onblur = function () {
+        hideInput(`txt-${id}`);
+      };
+
+      let newPar = document.createElement("p");
       newPar.id = `p-${id}`;
       newPar.innerHTML = txt;
       newPar.addEventListener("dblclick", showInput);
 
-      var newBtnDel = document.createElement("i");
+      let newBtnDel = document.createElement("i");
       newBtnDel.className = "fas fa-times";
       newBtnDel.id = `${id}`;
-      newBtnDel.addEventListener("click", delOneItem);
+      newBtnDel.onclick = function () {
+        delOneItem(`${id}`);
+      };
 
       newSubDiv.appendChild(newCheckBoxDiv);
       newSubDiv.appendChild(newPar);
@@ -60,7 +65,7 @@ function addItem(event) {
         items.filter((e) => e.status == false).length
       } `;
 
-      var ul = document.getElementById("container__list");
+      let ul = document.getElementById("container__list");
       id_count++;
       ul.appendChild(newLi);
       styleAllOption();
@@ -68,33 +73,31 @@ function addItem(event) {
     }
   }
 }
+
 function showInput() {
   let id = this.id.split("-")[1];
   let id_text = document.getElementById(`txt-${id}`);
-  document.getElementById(`p-${id}`).style.display = "none";
+  document.getElementById(`${id}`).style.display = "none"; //hide delete button
+  this.style.display = "none"; //hide p
   id_text.style.display = "block";
-  var val = document.getElementById(`p-${id}`).innerHTML;
-  id_text.focus(); //sets focus to element
+  let val = this.innerHTML; //get text of p
   id_text.value = ""; //clear the value of the element
   id_text.value = val; //set that value back.
-  document.getElementById(`${id}`).style.display = "none";
+  id_text.focus(); //sets focus to element
 }
 
-function hideInputEnter() {
-  let id_text = document.getElementById(`txt-${id}`);
-  document.getElementById(`p-${id}`).innerHTML = id_text.value;
-  id_text.style.display = "none";
-  document.getElementById(`p-${id}`).style.display = "block";
-  document.getElementById(`${id}`).style.display = null;
-}
+function hideInput(str) {
+  let text = document.getElementById(`${str}`);
+  let id_text = document.getElementById(`${str}`).id.split("-")[1];
 
-function hideInput() {
-  let id = this.id.split("-")[1];
-  let id_text = document.getElementById(`txt-${id}`);
-  document.getElementById(`p-${id}`).innerHTML = id_text.value;
-  this.style.display = "none";
-  document.getElementById(`p-${id}`).style.display = "block";
-  document.getElementById(`${id}`).style.display = null;
+  document.getElementById(`p-${id_text}`).innerHTML = text.value;
+  text.style.display = "none";
+  document.getElementById(`p-${id_text}`).style.display = "block";
+  document.getElementById(`${id_text}`).style.display = null;
+
+  for (let item of items) {
+    if (item.id == +id_text) item.txt = text.value;
+  }
 }
 
 function checkCompleted() {
@@ -106,9 +109,72 @@ function checkCompleted() {
 
   document.getElementById(`p-${id}`).classList.toggle("completed__item");
   document.getElementById("items__left").textContent = `${
-    items.filter((e) => e.status == false).length
+    items.filter((e) => !e.status).length
   } `;
 
+  styleAllOption();
+  styleClearCompleted();
+  filterOption(state);
+}
+
+function delOneItem(btn_id) {
+  items = items.filter((e) => e.id != btn_id);
+  document.getElementById(`${btn_id}`).parentNode.remove();
+
+  document.getElementById("items__left").textContent = `${
+    items.filter((e) => !e.status).length
+  } `;
+
+  styleClearCompleted();
+  styleAllOption();
+}
+
+function delAll() {
+  items.map((item) => {
+    if (item.status === true) delOneItem(item.id);
+  });
+}
+
+function filterOption(status) {
+  state = status;
+  let cur_active = document.getElementsByClassName("active");
+  cur_active[0].classList.remove("active");
+  let btn_filter = document.getElementsByClassName("btn");
+
+  items.map((item) => {
+    let li = document.getElementById(`li-${item.id}`);
+
+    if (state === "active") li.style.display = item.status ? "none" : null;
+    else if (state === "completed")
+      li.style.display = item.status ? null : "none";
+    else li.style.display = null;
+  });
+
+  if (state === "active") {
+    btn_filter[1].classList.add("active");
+  } else if (status === "completed") {
+    btn_filter[2].classList.add("active");
+  } else {
+    btn_filter[0].classList.add("active");
+  }
+}
+
+function allOption() {
+  let mustCheck = items.filter((item) => !item.status).length !== 0;
+  items.map((item) => {
+    item.status = mustCheck;
+    document.getElementById(`id-${item.id}`).checked = mustCheck;
+    if (mustCheck)
+      document.getElementById(`p-${item.id}`).classList.add("completed__item");
+    else
+      document
+        .getElementById(`p-${item.id}`)
+        .classList.remove("completed__item");
+  });
+
+  document.getElementById("items__left").textContent = `${
+    items.filter((item) => !item.status).length
+  } `;
   styleAllOption();
   styleClearCompleted();
   filterOption(state);
@@ -117,127 +183,18 @@ function checkCompleted() {
 function styleAllOption() {
   let footer__bar = document.getElementsByClassName("footer-bar");
   let _allOption = document.getElementById("allOption");
-  let lineEnding = document.getElementById("line__ending");
-  if (items.length > 0) {
-    _allOption.style.visibility = "visible";
-    footer__bar[0].style.display = "flex";
-    lineEnding.style.display = "block";
-    if (items.filter((e) => e.status == true).length == items.length)
-      _allOption.style.color = "gray";
-    else _allOption.style.color = null;
-  } else {
-    _allOption.style.visibility = "hidden";
-    footer__bar[0].style.display = "none";
-    lineEnding.style.display = "none";
-  }
+
+  _allOption.style.visibility = items.length > 0 ? "visible" : "hidden";
+  footer__bar[0].style.display = items.length > 0 ? "flex" : "none";
+  _allOption.style.color =
+    items.length > 0 &&
+    items.filter((e) => e.status == true).length == items.length
+      ? "gray"
+      : null;
 }
 
 function styleClearCompleted() {
   let btnClear = document.getElementsByClassName("btn__clear");
-  if (items.filter((e) => e.status == true).length > 0) {
-    btnClear[0].style.visibility = "visible";
-  } else btnClear[0].style.visibility = "hidden";
-}
-
-function delOneItem() {
-  this.parentNode.remove();
-  const id = this.id;
-  items = items.filter((e) => e.id != id);
-  document.getElementById("items__left").textContent = `${
-    items.filter((e) => e.status == false).length
-  } `;
-  styleClearCompleted();
-  styleAllOption();
-}
-
-function delAll() {
-  let arr = [];
-  for (let item of items) {
-    if (item.status == true) {
-      let li = document.getElementById(`li-${item.id}`);
-      li.parentNode.removeChild(li);
-    } else {
-      arr.push(item);
-    }
-  }
-  items = arr;
-  styleClearCompleted();
-  styleAllOption();
-}
-
-function showAll() {
-  for (let item of items) {
-    let li = document.getElementById(`li-${item.id}`);
-    li.style.display = null;
-  }
-}
-function active() {
-  for (let item of items) {
-    let li = document.getElementById(`li-${item.id}`);
-    if (item.status == true) {
-      li.style.display = "none";
-    } else {
-      li.style.display = null;
-    }
-  }
-}
-function completed() {
-  for (let item of items) {
-    let li = document.getElementById(`li-${item.id}`);
-    if (item.status == false) {
-      li.style.display = "none";
-    } else {
-      li.style.display = null;
-    }
-  }
-}
-function filterOption(status) {
-  state = status;
-  let cur_active = document.getElementsByClassName("active");
-  cur_active[0].classList.remove("active");
-  let btn_filter = document.getElementsByClassName("btn");
-  if (status == "all") {
-    btn_filter[0].classList.add("active");
-    showAll();
-  }
-  if (status == "active") {
-    btn_filter[1].classList.add("active");
-    active();
-  }
-  if (status == "completed") {
-    btn_filter[2].classList.add("active");
-    completed();
-  }
-}
-function allOption() {
-  if (items.filter((e) => e.status == false).length > 0) {
-    for (let item of items) {
-      if (item.status == false) {
-        item.status = true;
-        document.getElementById(`id-${item.id}`).checked = true;
-        document
-          .getElementById(`p-${item.id}`)
-          .classList.add("completed__item");
-        document.getElementById("allOption").style.color = "gray";
-      }
-    }
-    document.getElementById("items__left").textContent = `0 `;
-  } else {
-    for (let item of items) {
-      if (item.status == true) {
-        item.status = false;
-        document.getElementById(`id-${item.id}`).checked = false;
-        document
-          .getElementById(`p-${item.id}`)
-          .classList.remove("completed__item");
-        document.getElementById("allOption").style.color = null;
-      }
-    }
-    document.getElementById("items__left").textContent = `${
-      items.filter((e) => e.status == false).length
-    } `;
-  }
-  styleAllOption();
-  styleClearCompleted();
-  filterOption(state);
+  btnClear[0].style.visibility =
+    items.filter((e) => e.status).length > 0 ? "visible" : "hidden";
 }

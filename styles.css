@@ -7,6 +7,7 @@ body {
   background-color: #f5f5f5;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 25px;
+  color: #4d4d4d;
 }
 ul {
   list-style: none;
@@ -26,21 +27,27 @@ ul {
 h1 {
   text-align: center;
   color: #ecdcdc;
+  font-weight: lighter;
   font-size: 100px;
+}
+.todoapp {
+  margin: 20px auto;
+  min-width: 300px;
+  max-width: 550px;
+  box-shadow: 0 2px 4px 0 rgb(0 0 0 / 20%), 0 25px 50px 0 rgb(0 0 0 / 10%);
 }
 /* header for adding an item*/
 header {
-  margin: 20px auto;
   margin-bottom: 1px;
   background-color: white;
   display: flex;
   align-items: center;
-  width: 40%;
   box-shadow: 0px 5px 30px 1px lightgray;
 }
 input {
   border: none;
   font-family: Arial, Helvetica, sans-serif;
+  color: #4d4d4d;
   width: 100%;
   font-size: 25px;
   padding: 15px 0px;
@@ -52,11 +59,7 @@ input::placeholder {
 input:focus {
   outline: none;
 }
-/*contain items*/
-.container {
-  width: 40%;
-  margin: 0 auto;
-}
+
 .container ul {
   flex-wrap: wrap;
 }
@@ -149,9 +152,7 @@ input:focus {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  margin: 0 auto;
   padding: 10px 0px;
-  width: 40%;
   background-color: white;
   font-size: 14px;
   color: gray;
@@ -166,6 +167,9 @@ button {
   border: none;
   outline: none;
   background-color: white;
+  color: gray;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
   padding: 5px 7px;
 }
 .mid {
@@ -191,17 +195,4 @@ button:hover {
   font-size: 10px;
   color: lightgray;
   line-height: 20px;
-}
-#line__ending {
-  display: none;
-}
-.line {
-  margin: 0 auto;
-  width: 38%;
-  height: 5px;
-  background-color: white;
-  border-bottom: 1px solid lightgray;
-}
-.line__two {
-  width: 36%;
 }

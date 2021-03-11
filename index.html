@@ -14,39 +14,37 @@
 
     <body>
         <h1>todos</h1>
-        <header>
-            <i class="fas fa-angle-down" id="allOption" onclick="allOption()"></i>
-            <input
-                type="text"
-                id="txt_todo"
-                autocomplete="off"
-                placeholder="What needs to be done?"
-                onkeypress="addItem(event)"
-            />
-        </header>
-        <div class="container">
-            <ul id="container__list"></ul>
-        </div>
-        <footer class="footer-bar">
-            <p><span id="items__left">0 </span>items left</p>
-            <ul>
-                <li><button class="btn active" onclick="filterOption('all')">All</button></li>
-                <li><button class="btn mid" onclick="filterOption('active')">Active</button></li>
-                <li><button class="btn" onclick="filterOption('completed')">Completed</button></li>
-            </ul>
-            <button class="btn__clear" onclick="delAll()">Clear completed</button>
-        </footer>
-        <div id="line__ending">
-            <div class="line"></div>
-            <div class="line line__two"></div>
-        </div>
+        <section class="todoapp">
+            <header>
+                <i class="fas fa-angle-down" id="allOption" onclick="allOption()"></i>
+                <input
+                    type="text"
+                    id="txt_todo"
+                    autocomplete="off"
+                    placeholder="What needs to be done?"
+                    onkeypress="addItem(event)"
+                />
+            </header>
+            <div class="container">
+                <ul id="container__list"></ul>
+            </div>
+            <footer class="footer-bar">
+                <p><span id="items__left">0 </span>items left</p>
+                <ul>
+                    <li><button class="btn active" onclick="filterOption('all')">All</button></li>
+                    <li><button class="btn mid" onclick="filterOption('active')">Active</button></li>
+                    <li><button class="btn" onclick="filterOption('completed')">Completed</button></li>
+                </ul>
+                <button class="btn__clear" onclick="delAll()">Clear completed</button>
+            </footer>
+        </section>
         <footer class="instruction">
             <p>
                 Double-click to edit a todo
 
-                <br />Created by petehunt
+                <br />Created by DuyAn
 
-                <br />Part of TodoMVC
+                <br />Part of TodoJS
             </p>
         </footer>
     </body>
